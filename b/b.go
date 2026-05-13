@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Println(a.A())
+	fmt.Println(a.A() + "B")
 }

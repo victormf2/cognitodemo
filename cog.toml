@@ -1,10 +1,11 @@
-# Global settings
 from_latest_tag = true
 ignore_merge_commits = true
 tag_prefix = "v"
 
-[bump_profiles.breaking-is-minor]
-  breaking_changes_minor_bump = true
+post_bump_hooks = [
+  "git push",
+  "git push --tags",
+]
 
 [changelog]
 path = "CHANGELOG.md"
@@ -13,33 +14,23 @@ remote = "github.com"
 repository = "cognitodemo"
 owner = "victormf2"
 
-# Monorepo packages — bump_order respects dependency graph
-[packages.a]
+[monorepo.packages.a]
 path = "a"
 include = ["a/**"]
 public_api = true
 bump_order = 1
-
-[packages.b]
-path = "b"
-include = ["b/**"]
-public_api = true
-bump_order = 2
-
-[packages.a.post_bump_hooks]
-hooks = [
+post_bump_hooks = [
   "cd a && go mod tidy",
   "git add a/go.mod a/go.sum",
 ]
 
-[packages.b.post_bump_hooks]
-hooks = [
-  "cd b && go get github.com/you/b@{{version}}",
+[monorepo.packages.b]
+path = "b"
+include = ["b/**"]
+public_api = true
+bump_order = 2
+post_bump_hooks = [
+  "cd b && go get github.com/victormf2/a@{{version}}",
   "cd b && go mod tidy",
   "git add b/go.mod b/go.sum",
-]
-
-post_bump_hooks = [
-  "git push",
-  "git push --tags",
 ]
