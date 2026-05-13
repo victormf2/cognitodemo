@@ -1,0 +1,40 @@
+# pre_bump_hooks = [
+# "go build ./...",
+# "go test ./...",
+# ]
+# .github/workflows/release.yml
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+
+      - name: Bump version
+        uses: cocogitto/cocogitto-action@v4
+        id: release
+        with:
+          command: bump
+          args: --auto
+          git-user: "Cog Bot"
+          git-user-email: "mycoolproject@org.org"
+
+      - name: Changelog
+        uses: cocogitto/cocogitto-action@v4
+        with:
+          command: changelog
+          args: --at ${{ github.ref_name }}
+
+      - name: Print version
+        run: "echo '${{ steps.release.outputs.version }}'"
